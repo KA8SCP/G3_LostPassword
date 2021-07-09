@@ -5,4 +5,4 @@ Created by Jim Moen K6JM
 https://w6cx.dstargateway.org/resetpw.php
 
 # Manual Updates
-Change ini file for emaail notification
+Change etc/resetpw.ini file for your systems email
