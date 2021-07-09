@@ -1,0 +1,41 @@
+# A 3rd-Party Password Reset Feature for D-Star Registration Logons
+
+This Password Reset feature is intended as an add-on to the ICOM G2/G3 Registration Page logon
+procedure. It accesses the gateway’s Postgres database as read-only in order to verify the requestor’s
+callsign indeed has an account on the given gateway and to verify the requestor knows the email
+address on file for that callsign. Once the email with link has been received and the requestor clicks the
+link, a web page allows entry of the new password.
+
+Anti-SQL Injection techniques are employed, and the actual updating of the password is done by the
+program /dstar/tools/dstarpasswd running under root (using an authorized password reset program as
+opposed to writing code to update the registration database tables directly). This is accomplished by
+having the web page queue the reset request in a small Postgres table and having cron periodically
+launch a php script running under root to check that table and invoke the above program.
+
+A config file allows users to specify their Gateway’s callsign (in the examples below, W6CX), whether the
+reset feature should run under SSL, plus email details. The scripts assume PHPMailer has been installed
+on the gateway system. It is recommended to update the Registration logon page at
+/opt/products/dstar/D-STAR/TopMenu.jsp to provide a “Forgot your password” link to this feature. For
+example:
+
+
+
+Here the user enters callsign and email.
+
+
+The callsign is looked up to ensure it has an account on this gateway and the email address is on file for
+that callsign (thus eliminating most bogus reset requests), and the user is told to await the email.
+
+
+Here’s an example of the email with link. Note the link expires in one hour.
+
+
+The new password is required, but virtually no editing or duplicate entry is provided, due to the ease of
+doing another reset.
+
+
+At this point, the reset request is queued. It is recommended to have cron run the reset script once
+each second. It provides no measurable load on the system.
+
+
+The user is sent a confirmation email when reset is complete.
